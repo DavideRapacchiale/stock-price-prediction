@@ -57,10 +57,9 @@ Install the required packages by running:pip install -r requirements.txt
     *   **Timestamp**: Date in dd-mm-yyyy format.
         
     *   **Price**: Stock price for that date.
-        
+
 3.  Example CSV data format:Stock-ID,Timestamp,PriceAAPL,01-01-2021,130.5AAPL,02-01-2021,132.0
     
-
 ### Step 4: Create the Outputs Folder
 
 An outputs/ folder will be created automatically to store the prediction results. If it does not already exist, the script will generate it.
