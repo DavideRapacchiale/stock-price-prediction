@@ -1,109 +1,101 @@
 Stock Price Prediction
 ======================
 
-This project predicts the next 3 stock price values based on historical data using a rule-based approach. The application processes CSV files for different stock exchanges and generates predictions based on a simple statistical model.
+This script processes historical stock data for various exchanges (LSE, NASDAQ, NYSE), generates future price predictions based on a simple extrapolation formula, and saves the results as new CSV files in an output directory.
 
-Project Structure
------------------
+Folder Structure
+----------------
 
-*   **stock\_predictor.py**: Main script that retrieves data, generates predictions, and saves output.
+The project folder contains:
+
+*   **Data**: Folder containing subfolders for each exchange (LSE, NASDAQ, NYSE) with CSV files representing stock data.
     
-*   **data/**: Folder where input CSV files are stored, containing subfolders for each stock exchange:
+*   **Outputs**: Folder where the output files with predictions are saved.
     
-    *   LSE/
-        
-    *   NASDAQ/
-        
-    *   NYSE/
-        
-*   **outputs/**: Folder where the prediction results are saved as CSV files.
-    
-*   **requirements.txt**: List of required Python packages.
+*   **Main script**: Contains the code that performs data processing and prediction.
     
 
-Requirements
-------------
+### File Requirements
 
-*   Python 3.x
+*   Each input CSV file in the Data subfolders (e.g., Data/LSE/FLTR LSE.csv) must contain at least 10 rows of historical stock data.
     
-*   pandas: Install using the command: pip install pandas
-    
-
-Setup Instructions
-------------------
-
-### Step 1: Clone the Repository
-
-Clone the repository to your local machine by running:git clone [https://github.com/your-username/stock-price-prediction.git](https://github.com/your-username/stock-price-prediction.git)cd stock-price-prediction
-
-### Step 2: Install Dependencies
-
-Install the required packages by running:pip install -r requirements.txt
-
-### Step 3: Add Data Files
-
-1.  Place your stock data CSV files in the data/ directory, organized by exchange folders:
-    
-    *   data/LSE/
-        
-    *   data/NASDAQ/
-        
-    *   data/NYSE/
-        
-2.  Each CSV file should have the following columns:
+*   Expected columns in each file:
     
     *   **Stock-ID**: Unique identifier for the stock.
         
-    *   **Timestamp**: Date in dd-mm-yyyy format.
+    *   **Timestamp**: Date of each record in DD-MM-YYYY format.
         
-    *   **Price**: Stock price for that date.
+    *   **Price**: Closing price of the stock on that date.
+        
 
-3.  Example CSV data format:Stock-ID,Timestamp,PriceAAPL,01-01-2021,130.5AAPL,02-01-2021,132.0
+Functions Overview
+------------------
+
+### get\_random\_data\_points(file\_path, num\_points=10)
+
+*   **Purpose**: Reads a specified CSV file and extracts 10 consecutive data points starting from a random timestamp.
     
-### Step 4: Create the Outputs Folder
-
-An outputs/ folder will be created automatically to store the prediction results. If it does not already exist, the script will generate it.
-
-Running the Application
------------------------
-
-Run the main script to generate predictions by processing files from each exchange folder.
-
-By default, the generate\_predictions function processes up to 1 file from each exchange folder, but you can adjust this as needed.
-
-Run the script using:python stock\_predictor.py
-
-To specify the number of files to process from each exchange folder (e.g., 2 files), adjust the following line in the script:generate\_predictions(num\_files=2)
-
-Each processed file generates a CSV in the outputs/ folder containing the original 10 data points and 3 additional predictions.
-
-### Example Output Format
-
-Each output CSV file follows this format:Stock-ID,Timestamp,PriceAAPL,01-01-2021,130.5AAPL,02-01-2021,132.0...AAPL,11-01-2021,131.5AAPL,12-01-2021,133.0AAPL,13-01-2021,134.5
-
-Prediction Model
-----------------
-
-The prediction logic is as follows:
-
-1.  The first predicted value (n + 1) is the second-highest value among the last 10 data points.
+*   **Parameters**:
     
-2.  The second predicted value (n + 2) is half the difference between n (the last known price) and n + 1.
-    
-3.  The third predicted value (n + 3) is one-fourth the difference between n + 1 and n + 2.
+    *   file\_path (str): Path to the stock data CSV file.
+        
+    *   num\_points (int, optional): Number of consecutive data points to retrieve (default is 10).
+        
+*   **Returns**: A DataFrame containing the sampled data points or an empty DataFrame if an error occurs.
     
 
-This model provides a simple estimation based on recent price trends.
+### predict\_next\_3\_values(data\_points)
+
+*   **Purpose**: Predicts the next 3 prices based on the provided 10 data points.
+    
+*   **Parameters**:
+    
+    *   data\_points (DataFrame): DataFrame containing the 10 sampled stock prices.
+        
+*   **Returns**: A list containing 3 predicted price values.
+    
+
+### process\_exchange\_files(exchange\_folder, num\_files=1)
+
+*   **Purpose**: Processes each file in a specified exchange folder, generates predictions, and saves the results to the output directory.
+    
+*   **Parameters**:
+    
+    *   exchange\_folder (str): Name of the folder containing files for a specific stock exchange.
+        
+    *   num\_files (int, optional): Number of files to process in each folder (default is 1).
+        
+*   **File Output**: Saves a new CSV file with the predictions in the Outputs folder.
+    
+
+### generate\_predictions(num\_files=1)
+
+*   **Purpose**: Main function that iterates through each exchange folder (LSE, NASDAQ, NYSE) and processes a specified number of files.
+    
+*   **Parameters**:
+    
+    *   num\_files (int, optional): Number of files to process per exchange folder (default is 1).
+        
+
+Usage
+-----
+
+To generate predictions for stock prices, call the generate\_predictions function. For example, to process up to 2 files per exchange folder:
+
+`   generate_predictions(num_files=2)   `
+
+**This will:**
+
+1.  Retrieve 10 random data points from each file.
+    
+2.  Predict the next 3 price values based on a simple extrapolation formula.
+    
+3.  Save the original data along with the predictions in a new CSV file in the Outputs folder.
+    
 
 Error Handling
 --------------
 
-The application includes error handling for common issues:
-
-*   File Not Found: Checks if the specified files and folders exist.
+*   If a file is missing, empty, or does not meet the row requirement, an error message is printed, and the file is skipped.
     
-*   Empty Files: Handles cases where files are empty or contain no valid data.
-    
-*   Missing Columns: Ensures that the required Price column is present.
-    
-*   General Exceptions: Catches and logs unexpected errors without stopping the program
+*   If the expected columns (Stock-ID, Timestamp, Price) are missing, the script will raise an error and skip the file.
